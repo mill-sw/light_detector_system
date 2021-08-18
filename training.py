@@ -1,3 +1,4 @@
+
 import glob
 import os
 from datetime import datetime as dt
@@ -34,27 +35,21 @@ for file in glob.glob(path + "*.csv"):
     label_data = df['illuminance_onoff']
     time_data = df['device_data_reg_dtm']
 
-# preprocess
     new_label = change_labels(label_data, on, off, idle)
     df.drop(columns='illuminance_onoff')
     df['illuminance_onoff'] = new_label
 
+# preprocess
     norm_data = normalize(light_data)
 
-    kfold = KFold(n_splits=num_folds, shuffle=False)
+    train_data, test_data = split(norm_data, ratio)
+    train_label, test_label = split(label_data, ratio)
 
-    x, y = to_sequences(window, norm_data, label_data)
+    x_train, y_train = to_sequences(window, train_data, train_label)
+    x_test, y_test = to_sequences(window, test_data, test_label)
 
-    x, y = balance_data(x, y)
-
-    # train_data, test_data = split(norm_data, ratio)
-    # train_label, test_label = split(label_data, ratio)
-
-    # x_train, y_train = to_sequences(window, train_data, train_label)
-    # x_test, y_test = to_sequences(window, test_data, test_label)
-
-    # x_train, y_train = balance_data(x_train, y_train)
-    # x_test, y_test = balance_data(x_test, y_test)
+    x_train, y_train = balance_data(x_train, y_train)
+    x_test, y_test = balance_data(x_test, y_test)
 
     # y_train = one_hot_encoding(y_train)
     # y_test = one_hot_encoding(y_test)
@@ -62,7 +57,7 @@ for file in glob.glob(path + "*.csv"):
 
 # load
     try:
-        model_list = glob.glob('trained_model/*.h5')
+        model_list = glob.glob('trained_models/*.h5')
         model_name = max(model_list, key=os.path.getctime)
         model = k.models.load_model(model_name)
     except:
@@ -80,7 +75,6 @@ for file in glob.glob(path + "*.csv"):
 
     history = model.fit(x_train, y_train, validation_split=0.1, batch_size=6,
                         epochs=1000, verbose=1, callbacks=[es])  # callbacks=[es, tensorboard_callback])
-
 
 # # plot
 #     pd.DataFrame(history.history).plot(figsize=(16, 10), grid=1, xlabel="epoch", ylabel="accuracy")
@@ -119,7 +113,3 @@ for file in glob.glob(path + "*.csv"):
 #     result = inference_to_df(new_model, df)
 #     df['prediction'] = result
 #     df.to_csv("data.csv", index=False)
-
-
-
-

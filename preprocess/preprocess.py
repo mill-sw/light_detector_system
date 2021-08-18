@@ -51,6 +51,16 @@ def to_sequences(seq_size, t1, t2):
     return np.array(x), np.array(y)
 
 
+def inference_sequences(seq_size, t1):
+    x = []
+    for i in range(len(t1) - seq_size):
+        ta1 = t1[i:(i + seq_size)]
+        # ta1 = [[x] for x in ta1]
+        x.append(ta1)
+
+    return np.array(x)
+
+
 def balance_data(t1, t2):
     x = []
     y = []
