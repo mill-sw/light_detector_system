@@ -1,14 +1,10 @@
 import glob
 import os
-from datetime import datetime as dt
 
 import pandas as pd
-import keras_tuner as kt
-import tensorflow.keras as k
-from sklearn.model_selection import KFold
-from tensorflow.keras.callbacks import EarlyStopping
 import plotly.express as px
 
+from helper.path import *
 from model.models import *
 from preprocess.preprocess import *
 
@@ -16,16 +12,11 @@ from preprocess.preprocess import *
 light_col = "조도"
 date_col = "측정일시 koKR"
 
-idle = 0
-on = 1
-off = 2
+idle, one, off = 0, 1, 2
 
 window = 6
 
-date = dt.now().strftime("%Y%m%d")
-time = dt.now().strftime("%H%M%S")
-
-model_path = "trained_models/"
+date = "20210818"
 
 path = '/home/z/data/test1/'
 for file in glob.glob(path + "*.csv"):
@@ -65,4 +56,4 @@ for file in glob.glob(path + "*.csv"):
 
 # save to csv
     filename = os.path.basename(file)
-    df.to_csv(f"result/{filename}", index=False)
+    df.to_csv(csv_path + filename, index=False)

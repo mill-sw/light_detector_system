@@ -1,19 +1,22 @@
 import glob
 import os
-from datetime import datetime as dt
 
 import pandas as pd
 import keras_tuner as kt
 import tensorflow.keras as k
 from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
+from sklearn.preprocessing import label_binarize
 from tensorflow.keras.callbacks import EarlyStopping
 
+from helper.path import *
 from model.models import *
+from postprocess.analyze import draw_CM, draw_ROC_AUC
 from preprocess.preprocess import *
 
 # # load tensorboard
 # %load_ext tensorboard
+
 classes = ["idle", "on", "off"]
 class_list = list(range(len(classes)))
 
@@ -26,12 +29,6 @@ input = 1
 output = 3
 
 num_folds = 5
-
-date = dt.now().strftime("%Y%m%d")
-time = dt.now().strftime("%H%M%S")
-
-log_path = "logs/" + f"{date}/" + f"{time}"
-model_path = "trained_models/"
 
 # load data
 path = '/home/z/data/label/'
@@ -106,20 +103,15 @@ for file in glob.glob(path + "*.csv"):
 # # predict
 #     predict = model.predict(x[test])
 #     predicted = np.argmax(predict, axis=1)
-
+#
 # # CM
-#     draw_CM(y_test, predicted)
+#     draw_CM(y[test], predicted)
 #
 # # ROC, AUC
 #     x = label_binarize(predicted, classes=class_list)
-#     y = label_binarize(y_test, classes=class_list)
+#     y = label_binarize(y[test], classes=class_list)
 #
 #     draw_ROC_AUC(x, y, class_list)
 
 # # launch tensorboard @ localhost:6006
     # %tensorboard --logdir logs/ --host localhost --port 6006
-
-# # save csv
-#     result = inference_to_df(new_model, df)
-#     df['prediction'] = result
-#     df.to_csv("data.csv", index=False)
